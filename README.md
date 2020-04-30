@@ -44,7 +44,6 @@ The [ANSI](http://ascii-table.com/ansi-codes.php) character set includes the sta
     output_path = lzw_h.compress()
     output_path = lzw.compress()
     output_path = h.compress()
-
     ```
 - Decompress method  
   input: file_path_to_decompress(.bin)  
