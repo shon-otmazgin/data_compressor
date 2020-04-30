@@ -44,15 +44,16 @@ The [ANSI](http://ascii-table.com/ansi-codes.php) character set includes the sta
     output_path = lzw_h.compress()
     output_path = lzw.compress()
     output_path = h.compress()
+
     ```
 - Decompress method  
   input: file_path_to_decompress(.bin)  
   return: output_file_**path** name and creating '_decompressed.txt' file with the data decompressed.  
   Example:
   ```python
-    output_path = lzw_h.compress()
-    output_path = lzw.compress()
-    output_path = h.compress()
+    output_path = lzw_h.decompress(output_path)
+    output_path = lzw.lzw_decompress(output_path)
+    output_path = h.decompress(output_path)
     ```
   
  For full Example please run ```tester_lzw_huffman.py```, ```tester_lzw.py```, ```tester_huffman.py```
