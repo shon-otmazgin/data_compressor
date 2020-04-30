@@ -1,10 +1,7 @@
-|   |  |   |   |
-|---|---|---|---|
+|   |  |
+|---|---|
 | Shon Otmazgin  |  305394975 |
-| Sapir Rubin  |  301659751 |
-
-Shon Otmazgin| |  
- 
+| Sapir Rubin  |  301659751 | 
 
 ### Abstract
 Compering 3 methods for compressing text files:
