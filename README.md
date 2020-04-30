@@ -1,3 +1,11 @@
+|   |  |   |   |
+|---|---|---|---|
+| Shon Otmazgin  |  305394975 |
+| Sapir Rubin  |  301659751 |
+
+Shon Otmazgin| |  
+ 
+
 ### Abstract
 Compering 3 methods for compressing text files:
 - Lempel-Ziv-Welch
