@@ -2,7 +2,35 @@
 ANSI stands for American National Standards Institute.  
 The [ANSI](http://ascii-table.com/ansi-codes.php) character set includes the standard ASCII character set (values 0 to 127), plus an extended character set (values 128 to 255).
 
-### Results:
+### Instrucations
+- Send the imput file **path** to constructor classes  
+    Example:
+    ```python
+    path = 'dickens.txt'
+    
+    lzw_h = Lempel_Ziv_Huffman_Coding(path=path)
+    lzw = LZW_Coding(path=path)
+    h = Huffman_Coding(path=path)
+    ```
+- Compress method  
+  return: output_file_**path** name(.bin) and creating file with data compressed.  
+  Example:
+  ```python
+    output_path = lzw_h.compress()
+    output_path = lzw.compress()
+    output_path = h.compress()
+    ```
+- Decompress method  
+  input: file_path_to_decompress(.bin)  
+  return: output_file_**path** name and creating '_decompressed.txt' file with the data decompressed.  
+  Example:
+  ```python
+    output_path = lzw_h.compress()
+    output_path = lzw.compress()
+    output_path = h.compress()
+    ```
+
+### Results
 Tested file: [dickens.txt](https://github.com/kzjeef/algs4/blob/master/burrows-wheelers/testfile/dickens.txt)  
 
 |   | LZW + Huffman | LZW  |  Huffman |
