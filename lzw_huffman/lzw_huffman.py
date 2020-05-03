@@ -1,6 +1,8 @@
 import os
 import heapq
 from utils.heap_node import HeapNode
+from utils.bytes_utils import pad_encoded_text, remove_padding, get_byte_array
+
 
 ASCII_TO_INT: dict = {i.to_bytes(1, 'big'): i for i in range(256)}
 INT_TO_ASCII: dict = {i: b for b, i in ASCII_TO_INT.items()}
@@ -8,6 +10,9 @@ INT_TO_ASCII: dict = {i: b for b, i in ASCII_TO_INT.items()}
 
 class Lempel_Ziv_Huffman_Coding:
     def __init__(self, path):
+        """
+        :param path: the file path to compress
+        """
         self.path = path
         self.lzw_n_bits = None
         self.lzw_keys = ASCII_TO_INT.copy()
@@ -20,6 +25,10 @@ class Lempel_Ziv_Huffman_Coding:
         self.reverse_mapping = {}
 
     def compress(self):
+        """
+        compress the file located in self.path using lempel-ziv & huffman algo.
+        :return: None. saving the compressed data into filename + ".bin"
+        """
         filename, file_extension = os.path.splitext(self.path)
         output_path = filename + ".bin"
 
@@ -34,6 +43,11 @@ class Lempel_Ziv_Huffman_Coding:
         return output_path
 
     def decompress(self, input_path):
+        """
+        decompress input_file
+        :param input_path: the file to decompress using huffman & lempel-ziv algo.
+        :return: None. file decompressed saved to filename + "_decompressed" + ".txt"
+        """
         filename, file_extension = os.path.splitext(self.path)
         output_path = filename + "_decompressed" + ".txt"
 
@@ -56,7 +70,12 @@ class Lempel_Ziv_Huffman_Coding:
             output.write(b)
         return output_path
 
-    def lzw_compress(self, data) -> bytes:
+    def lzw_compress(self, data):
+        """
+        compressing text file using lempel-ziv algo.
+        :param data: data text to compress using lempel-ziv algo
+        :return: list of numbers - the data encoded.
+        """
         compressed: list = []
         string = b''
 
@@ -81,36 +100,12 @@ class Lempel_Ziv_Huffman_Coding:
         # b = self.get_byte_array(padded_encoded_text=padded_text)
         # return b
 
-    def remove_padding(self, padded_encoded_text):
-        padded_info = padded_encoded_text[:8]
-        extra_padding = int(padded_info, 2)
-
-        padded_encoded_text = padded_encoded_text[8:]
-        encoded_text = padded_encoded_text[:-1 * extra_padding]
-
-        return encoded_text
-
-    def pad_encoded_text(self, encoded_text):
-        extra_padding = 8 - len(encoded_text) % 8
-        for i in range(extra_padding):
-            encoded_text += "0"
-
-        padded_info = "{0:08b}".format(extra_padding)
-        encoded_text = padded_info + encoded_text
-        return encoded_text
-
-    def get_byte_array(self, padded_encoded_text):
-        if len(padded_encoded_text) % 8 != 0:
-            print("Encoded text not padded properly")
-            exit(0)
-
-        b = bytearray()
-        for i in range(0, len(padded_encoded_text), 8):
-            byte = padded_encoded_text[i:i + 8]
-            b.append(int(byte, 2))
-        return b
-
     def lzw_decompress(self, huffman_decompress):
+        """
+        decompress using lempel-ziv algo. the data should be decompressed using huffman
+        :param huffman_decompress: list of numbers to decompress
+        :return: text decoded
+        """
         decoded_text = []
         for code in huffman_decompress:
             decoded_text.append(self.reverse_lzw_keys[code])
@@ -118,6 +113,10 @@ class Lempel_Ziv_Huffman_Coding:
         return b''.join(decoded_text)
 
     def make_frequency_dict(self, text):
+        """
+        :param text: text to count the frequency of each character
+        :return: None saved to self.frequency
+        """
         for character in text:
             try:
                 self.frequency[character] += 1
@@ -125,11 +124,19 @@ class Lempel_Ziv_Huffman_Coding:
                 self.frequency[character] = 1
 
     def make_heap(self):
+        """
+        creating heap: node for each character value is the frequency.
+        :return: None saved to self.heap
+        """
         for key, frq in self.frequency.items():
             node = HeapNode(key, frq)
             heapq.heappush(self.heap, node)
 
     def merge_nodes(self):
+        """
+        merging each 2 nodes(node characters) in heap with the lowest frequencies until no 2 nodes for characters
+        :return: None. saved to self.heap
+        """
         while len(self.heap) > 1:
             node1 = heapq.heappop(self.heap)
             node2 = heapq.heappop(self.heap)
@@ -141,6 +148,12 @@ class Lempel_Ziv_Huffman_Coding:
             heapq.heappush(self.heap, merged)
 
     def make_codes_helper(self, root, current_code):
+        """
+        recursive method to calculate the code for root
+        :param root: the root of the heap/the sub tree during the recursive
+        :param current_code: the current mode in the path to the character
+        :return: None saved to self.codes and self.reverse_mapping
+        """
         if root is None:
             return
 
@@ -153,17 +166,31 @@ class Lempel_Ziv_Huffman_Coding:
         self.make_codes_helper(root.right, current_code + "1")
 
     def make_codes(self):
+        """
+        creating code and the reserve info for each character
+        :return: None saved to self.codes and self.reverse_mapping
+        """
         root = heapq.heappop(self.heap)
         current_code = ""
         self.make_codes_helper(root, current_code)
 
     def get_encoded_text(self, text):
+        """
+        encoding the text to string of bits
+        :param text: the text to encode
+        :return: the encoded text - bits string
+        """
         encoded_text_list = []
         for character in text:
             encoded_text_list.append(self.codes[character])
         return ''.join(encoded_text_list)
 
     def huffman_compress(self, lzw_compress):
+        """
+        getting data compressed after lempel ziv algo. and compress it using huffman.
+        :param lzw_compress: list of numbers -> the data compressed with lempel-ziv
+        :return: bytes -> the data compressed with huffman.
+        """
         # text = text.rstrip()
 
         self.make_frequency_dict(lzw_compress)
@@ -173,14 +200,19 @@ class Lempel_Ziv_Huffman_Coding:
 
         encoded_text = self.get_encoded_text(lzw_compress)
 
-        padded_encoded_text = self.pad_encoded_text(encoded_text)
+        padded_encoded_text = pad_encoded_text(encoded_text)
 
-        b = self.get_byte_array(padded_encoded_text)
+        b = get_byte_array(padded_encoded_text)
 
         print("Compressed Huffman")
         return b
 
     def decode_text(self, encoded_text):
+        """
+        transforming bit string to text
+        :param encoded_text: bits string encoded text
+        :return: text decoded.
+        """
         current_code = ""
         decoded_list = []
 
@@ -192,7 +224,12 @@ class Lempel_Ziv_Huffman_Coding:
         return decoded_list
 
     def huffman_decompress(self, padded_encoded_text):
-        encoded_text = self.remove_padding(padded_encoded_text)
+        """
+        decompressing bits string using huffman
+        :param padded_encoded_text: the bits sting to decompressed
+        :return: list of numbers (the data compressed using lempel ziv)
+        """
+        encoded_text = remove_padding(padded_encoded_text)
 
         decompressed_list = self.decode_text(encoded_text)
         print("Decompressed Huffman")
